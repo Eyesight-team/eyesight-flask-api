@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-FIRESTORE_CREDENTIALS = "./serviceAccount.json"
+FIRESTORE_CREDENTIALS = "./capstone-project-441604-4d88bad0e9e4.json"
 db = firestore.Client.from_service_account_json(FIRESTORE_CREDENTIALS)
 
 def save_prediction(data):
