@@ -8,7 +8,7 @@
    `pip install -r requirements.txt`
 4. Set up Firestore credentials 
 5. Update the Mobile URL<br>
-   `Mobile_URL = "http://<mobile-ip-address>:<port>/predict"`
+   `MOBILE_URL = "http://<mobile-ip-address>:<port>/predict"`
 
 ### The Flask API running on
 `http://127.0.0.1:8080`
