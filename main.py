@@ -8,7 +8,7 @@ app = Flask(__name__)
 FIRESTORE_CREDENTIALS = "./capstone-project-441604-4d88bad0e9e4.json"
 db = firestore.Client.from_service_account_json(FIRESTORE_CREDENTIALS)
 
-JETSON_URL = "http://<jetson-ip-address>:<port>/predict" #waiting for Jetson URL
+MOBILE_URL = "http://<mobile-ip-address>:<port>/predict" #waiting for mobile URL
 
 def save_prediction(data):
     
@@ -35,15 +35,15 @@ def predict():
         return jsonify({"error": "Invalid input"}), 400
 
     try:
-        jetson_response = requests.post(JETSON_URL, json=data)
-        jetson_response.raise_for_status()  
-        jetson_result = jetson_response.json()
+        mobile_response = requests.post(MOBILE_URL, json=data)
+        mobile_response.raise_for_status()  
+        mobile_result = mobile_response.json()
 
-        tes_kelayakan = jetson_result.get('tes_kelayakan')
-        confidence_level = jetson_result.get('confidence_level')
+        tes_kelayakan = mobile_result.get('tes_kelayakan')
+        confidence_level = mobile_result.get('confidence_level')
 
         if tes_kelayakan is None or confidence_level is None:
-            return jsonify({"error": "Invalid response from Jetson"}), 500
+            return jsonify({"error": "Invalid response from mobile"}), 500
 
         status = "Lolos" if tes_kelayakan >= 70 and confidence_level >= 70 else "Tidak Lolos"
 
@@ -60,7 +60,7 @@ def predict():
         return jsonify({"id": prediction_id, "result": prediction_data}), 201
 
     except request.RequestException as e:
-        return jsonify({"error": f"Failed to connect to Jetson: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to connect to mobile: {str(e)}"}), 500
 
 @app.route('/predict/histories', methods=['GET'])
 def get_histories():
