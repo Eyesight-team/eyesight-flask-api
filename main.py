@@ -66,29 +66,31 @@ def predict_image(image_path):
 @app.route('/predict', methods=['POST'])
 def predict():
     doc_ref = store.collection(u'predictions')
-    # Cek apakah file terkirim
-    if 'image' not in request.files:
-        return jsonify({"error": "Tidak ada file terkirim"}), 400
-    file = request.files['image']
 
-    if file.filename == "":
-        return jsonify({"error": "File kosong"}), 400
+    # Access the camera
+    cap = cv2.VideoCapture(0) 
 
-    if not allowed_file(file.filename):
-        return jsonify({"error": "Ekstensi file tidak didukung"}), 400
+    if not cap.isOpened():
+        return jsonify({"error": "Gagal membuka kamera"}), 400
 
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(UPLOADS_FOLDER, filename)
-    file.save(filepath)
+    ret, frame = cap.read()
+    if not ret:
+        return jsonify({"error": "Gagal menangkap gambar"}), 400
 
-    results = predict_image(filepath)
-    if(results['confidence'] > 70):
+    filename = "temp_image.jpg"
+    cv2.imwrite(filename, frame)
+
+    results = predict_image(filename)
+    if results and results['confidence'] > 70:
         results['status'] = 'Lolos'
     else:
         results['status'] = 'Tidak Lolos'
+
     doc_ref.add(results)
 
-    os.remove(filepath)
+    os.remove(filename)
+
+    cap.release()
     return jsonify(results)
 
 if __name__ == '__main__':
