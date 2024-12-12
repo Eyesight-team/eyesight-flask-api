@@ -1,71 +1,37 @@
-from flask import Flask, jsonify, request
-from google.cloud import firestore
-from datetime import datetime
+from flask import Flask, request, jsonify
+from firebase_admin import credentials, firestore, initialize_app
 import requests
 
 app = Flask(__name__)
 
-FIRESTORE_CREDENTIALS = "./capstone-project-441604-4d88bad0e9e4.json"
-db = firestore.Client.from_service_account_json(FIRESTORE_CREDENTIALS)
-
-MOBILE_URL = "http://<mobile-ip-address>:<port>/predict" #waiting for mobile URL
-
-def save_prediction(data):
-    
-    doc_ref = db.collection('predictions').document()
-    data['id'] = doc_ref.id 
-    doc_ref.set(data)
-    return doc_ref.id
-
-def get_predictions():
-    predictions = db.collection('predictions').stream()
-    results = []
-    for doc in predictions:
-        data = doc.to_dict()
-        data['id'] = doc.id  
-        results.append(data)
-    return results
+cred = credentials.Certificate("./capstone-project-441604-4d88bad0e9e4.json")
+initialize_app(cred)
+db = firestore.client()
 
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
-    nama_barang = data.get('nama_barang')
-    
-    if nama_barang is None:
-        return jsonify({"error": "Invalid input"}), 400
+    camera_device = data.get("camera_device", "")
 
-    try:
-        mobile_response = requests.post(MOBILE_URL, json=data)
-        mobile_response.raise_for_status()  
-        mobile_result = mobile_response.json()
+    jetson_response = requests.post("http://jetson-endpoint/predict", json={"camera_device": camera_device})
+    jetson_data = jetson_response.json()
 
-        tes_kelayakan = mobile_result.get('tes_kelayakan')
-        confidence_level = mobile_result.get('confidence_level')
+    item_name = jetson_data.get("item_name")
+    confidence_level = jetson_data.get("confidence_level")
 
-        if tes_kelayakan is None or confidence_level is None:
-            return jsonify({"error": "Invalid response from mobile"}), 500
+    status = "Lolos" if confidence_level > 70 else "Tidak Lolos"
 
-        status = "Lolos" if tes_kelayakan >= 70 and confidence_level >= 70 else "Tidak Lolos"
+    prediction_data = {
+        "id": data.get("id"),
+        "nama_barang": item_name,
+        "confidence_level": confidence_level,
+        "status": status,
+        "timestamp": firestore.SERVER_TIMESTAMP
+    }
 
-        prediction_data = {
-            "nama_barang": nama_barang,
-            "tes_kelayakan": tes_kelayakan,
-            "confidence_level": confidence_level,
-            "status": status,
-            "processed_at": datetime.utcnow().isoformat()
-        }
+    db.collection("predictions").add(prediction_data)
 
-        prediction_id = save_prediction(prediction_data)
-
-        return jsonify({"id": prediction_id, "result": prediction_data}), 201
-
-    except request.RequestException as e:
-        return jsonify({"error": f"Failed to connect to mobile: {str(e)}"}), 500
-
-@app.route('/predict/histories', methods=['GET'])
-def get_histories():
-    predictions = get_predictions()
-    return jsonify(predictions), 200
+    return jsonify(prediction_data)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=8080)
