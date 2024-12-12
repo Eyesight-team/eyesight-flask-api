@@ -86,6 +86,8 @@ def predict():
     else:
         results['status'] = 'Tidak Lolos'
 
+    results['timestamp'] = datetime.now().isoformat()
+
     doc_ref.add(results)
 
     os.remove(filename)
