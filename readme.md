@@ -1,4 +1,5 @@
-# Flask API with TensorFlow Lite
+# **Eyesight Flask API Documentation**
+**_Giving Prediction From Jetson_**
 
 This project sets up a Flask API that uses a TensorFlow Lite model to make predictions based on uploaded images. The model used in this project is `Fruits-fp16.tflite`, and it classifies various types of fruits.
 
@@ -10,38 +11,44 @@ Before you begin, make sure you have the following installed on your system:
 - pip (Python package installer)
 
 ## Setup Instructions
+1. Clone this repository <br>
+   `git clone https://github.com/Eyesight-team/eyesight-flask-api.git`
+3. Install required dependencies <br>
+   `pip install -r requirements.txt`
+4. Set up Firestore credentials 
 
-### 1. Clone the Repository
+### The Flask API running on
+`http://localhost:5000/predict`
 
-Clone this repository to your local machine:
+## API Endpoints
+### POST /predict
+<pre>
+{
+    "id": "prediction-id",
+    "result": {
+        "label": "label",
+        "confidence": "confidence",
+        "status": "status",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+}
+</pre>
 
-```bash
-    git clone url
-```
+### GET /predict/histories
+<pre>
+  [
+    {
+        "id": "prediction-id",
+        "label": "label",
+        "confidence": "confidence",
+        "status": "status",
+        "timestamp": datetime.utcnow().isoformat()
+    },
+    ...
+]
+</pre>
 
-### 2. install dependency
+## Deploy on Google Cloud Run
 
-Clone this repository to your local machine:
-
-```bash
-    pip install -r requirements.txt
-```
-
-### 3. Run the app flask !
-
-Clone this repository to your local machine:
-
-```bash
-    python main.py
-```
-
-### Api Documentations
-
-``` http
-url    :  http://localhost:5000/predict
-method :  post
-body (form data) : file
-
-```
 
 
