@@ -18,7 +18,7 @@ Before you begin, make sure you have the following installed on your system:
 4. Set up Firestore credentials 
 
 ### The Flask API running on
-`http://localhost:5000/predict`
+`http://127.0.0.1:8080/predict`
 
 ## API Endpoints
 ### POST /predict
