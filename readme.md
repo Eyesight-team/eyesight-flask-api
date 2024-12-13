@@ -34,6 +34,19 @@ Before you begin, make sure you have the following installed on your system:
 }
 </pre>
 
+### GET /predict
+<pre>
+{
+    "id": "prediction-id",
+    "result": {
+        "label": "label",
+        "confidence": "confidence",
+        "status": "status",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+}
+</pre>
+
 ### GET /predict/histories
 <pre>
   [
