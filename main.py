@@ -61,9 +61,25 @@ def get_predict():
             "device": "Jetson Nano",
         }
 
-        store.collection('predictions').add(prediction_result)
-
         return jsonify(prediction_result), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/predict/histories', methods=['GET'])
+def get_histories():
+    try:
+
+        predictions_ref = store.collection('predictions')
+        docs = predictions_ref.stream()
+
+        histories = []
+        for doc in docs:
+            history = doc.to_dict()
+            history['id'] = doc.id 
+            histories.append(history)
+
+        return jsonify(histories), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
