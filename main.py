@@ -14,11 +14,13 @@ store = firestore.client()
 @app.route('/predict', methods=['POST'])
 def post_predict():
     try:
+        input_data = request.get_json()
+        
         #dummy
-        jetson_response = {
-            "label": "apple",
-            "confidence": 0.85,
-        }
+        #jetson_response = {
+        #    "label": "apple",
+        #    "confidence": 0.85,
+        #}
 
         prediction_result = {
             "id": os.urandom(8).hex(),
@@ -47,10 +49,10 @@ def get_predict():
         # jetson_response = requests.post(JETSON_URL, json=input_data).json()
 
         #dummy test
-        jetson_response = {
-            "label": "apple",
-            "confidence": 0.85,
-        }
+        #jetson_response = {
+        #    "label": "apple",
+        #    "confidence": 0.85,
+        #}
 
         prediction_result = {
             "id": os.urandom(8).hex(),
