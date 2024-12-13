@@ -12,7 +12,7 @@ firebase_admin.initialize_app(cred)
 store = firestore.client()
 
 @app.route('/predict', methods=['POST'])
-def predict():
+def post_predict():
     try:
         #dummy
         jetson_response = {
@@ -35,6 +35,42 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/predict', methods=['GET'])
+def get_predict():
+    try:
+        # Ambil data dari request
+        #input_data = request.get_json()
+
+        # Kirim permintaan ke Jetson (ganti `JETSON_URL` dengan URL Jetson)
+        #JETSON_URL = "http://<JETSON_IP>:<PORT>/predict"
+        # jetson_response = requests.post(JETSON_URL, json=input_data).json()
+
+        #dummy test
+        jetson_response = {
+            "label": "apple",
+            "confidence": 0.85,
+        }
+
+        prediction_result = {
+            "id": os.urandom(8).hex(),
+            "label": jetson_response["label"],
+            "confidence": jetson_response["confidence"],
+            "status": "Lolos" if jetson_response["confidence"] > 0.7 else "Tidak Lolos",
+            "timestamp": datetime.now().isoformat(),
+            "device": "Jetson Nano",
+        }
+
+        store.collection('predictions').add(prediction_result)
+
+        return jsonify(prediction_result), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/')
+def index():
+    return "Service is running!"
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080, host='0.0.0.0')
