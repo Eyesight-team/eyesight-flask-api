@@ -34,7 +34,7 @@ Before you begin, make sure you have the following installed on your system:
 }
 </pre>
 
-### GET /predict
+### GET /predict/test
 <pre>
 {
     "id": "prediction-id",
