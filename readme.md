@@ -61,8 +61,5 @@ Before you begin, make sure you have the following installed on your system:
 ]
 </pre>
 
-## Deploy on Google Cloud Run
-**Flask API URL**
-`https://eyesight-flask-api-261037252049.asia-southeast2.run.app`
 
 
